@@ -1,3 +1,6 @@
+"""
+ENSIAS C Project Code Generator: Conceived and implemented by: ALAOUI Mehdi. 2016. All Rights Reserved.
+"""
 import sys
 import re
 #Functions that parse input file
@@ -37,67 +40,24 @@ def getField(INPUT_STR):#We use Regex to filter field name and field type from a
 #Functions that generate content for functions
 
 def initStructure(structureName):
-    functionContent=""
-    functionContent+=structureName + "* init" + str(structureName).capitalize() + "(){\n\n"
-    functionContent+="\t" + structureName + "* new_pointer=(" + structureName + " *)malloc(sizeof(" + structureName + "));\n"
-    functionContent+="\tnew_pointer->next=NULL;\n"
-    functionContent+="\treturn new_pointer;\n"
-    functionContent+="}\n"
-    return functionContent
+    content=structureName + "* init" + str(structureName).capitalize() + "(){\n\n\t" + structureName + "* new_pointer=(" + structureName + " *)malloc(sizeof(" + structureName + "));\n\tnew_pointer->next=NULL;\n\treturn new_pointer;\n}\n"
+    return content
 
 def loadWriteFile(structureName):
     content = structureName + "* load" + str(structureName).capitalize() + "FromFile(char* FileName){\n\n"
-    content+="\tFILE * fichier = NULL;\n"
-    content+="\t"+structureName+"* Liste = NULL;\n"
-    content+="\tfichier = fopen(FileName, \"rb\"); \n"
-    content+="\tif (fichier == NULL){ \n"
-    content+="\t\tprintf(\"Le fichier  est inexistant\\n\");\n\t}\n"
-    content+="\telse{\n"
-    content+="\t\tprintf(\" Chargement des données réussi \\n\");\n"
-    content+="\t\t"+structureName+"* pointer=NULL, * previous=NULL;\n"
-    content+="\t\tif (feof(fichier) == 0){\n"
-    content+="\t\t\tpointer=("+structureName + " * )malloc(sizeof("+structureName+"));\n"
-    content+="\t\t\tfread (pointer, sizeof("+structureName+ "), 1, fichier);\n"
-    content+="\t\t\tprevious=pointer;\n"
-    content+="\t\t\tListe=pointer;\n\t\t}\n"
-    content+="\t\twhile (pointer->next != NULL){\n"
-    content+="\t\t\tpointer=("+structureName +" * )malloc(sizeof("+structureName +"));\n"
-    content+="\t\t\tfread (pointer, sizeof("+structureName +"), 1, fichier);\n"
-    content+="\t\t\tprevious->next=pointer;\n"
-    content+="\t\t\tprevious=pointer;\n\t\t}\n"
-    content+="\t\tpointer->next = NULL;\n"
-    content+="\t\tfclose(fichier);\n\t}\n"
-    content+="\treturn Liste;\n}\n"
-    content+="void write" + str(structureName).capitalize() + "InFile(char *fileName," + structureName + "* liste){\n\n"
-    content+="\tFILE *fichier=fopen(fileName,\"wb\");\n\n"
-    content+="\t" + structureName + " *pointer=liste;\n\n"
-    content+="\twhile(pointer!=NULL){\n"
-    content+="\t\tfwrite (pointer, sizeof(" + structureName + "),1, fichier);\n"
-    content+="\t\tpointer=pointer->next;\n"
-    content+="\t}\n"
-    content+="\tprintf(\"Modifications enregistrées\\n\");\n"
-    content+="\tfclose(fichier);\n"
-    content+="}\n"
+    content+="\tFILE * fichier = NULL;\n\t"+structureName+"* Liste = NULL;\ntfichier = fopen(FileName, \"rb\"); \n"
+    content+="\tif (fichier == NULL){ \n\t\tprintf(\"Le fichier  est inexistant\\n\");\n\t}\n\telse{\n\t\tprintf(\" Chargement des données réussi \\n\");\n\t\t"+structureName+"* pointer=NULL, * previous=NULL;\n"
+    content+="\t\tif (feof(fichier) == 0){\n\t\t\tpointer=("+structureName + " * )malloc(sizeof("+structureName+"));\n"
+    content+="\t\t\tfread (pointer, sizeof("+structureName+ "), 1, fichier);\n\t\t\tprevious=pointer;\n\t\t\tListe=pointer;\n\t\t}\n\t\twhile (pointer->next != NULL){\n\t\t\tpointer=("+structureName +" * )malloc(sizeof("+structureName +"));\n"
+    content+="\t\t\tfread (pointer, sizeof("+structureName +"), 1, fichier);\n\t\t\tprevious->next=pointer;\n\t\t\tprevious=pointer;\n\t\t}\n\t\tpointer->next = NULL;\n"
+    content+="\t\tfclose(fichier);\n\t}\n\treturn Liste;\n}\nvoid write" + str(structureName).capitalize() + "InFile(char *fileName," + structureName + "* liste){\n\n\tFILE *fichier=fopen(fileName,\"wb\");\n\n"
+    content+="\t" + structureName + " *pointer=liste;\n\n\twhile(pointer!=NULL){\n\t\tfwrite (pointer, sizeof(" + structureName + "),1, fichier);\n\t\tpointer=pointer->next;\n\t}\n\tprintf(\"Modifications enregistrées\\n\");\n\tfclose(fichier);\n}\n"
     return content
 
 def insertTopEndReverse(structureName):
-    content=structureName+"* insert"+str(structureName).capitalize()+"Top("+structureName+"* List, "+structureName+"* element){\n\n"
-    content+="\telement->next=List;\n\treturn element;\n}\n"
-    content+=structureName+"* insert"+str(structureName).capitalize()+"End("+structureName+"* List, "+structureName+"* element){\n\n"
-    content+="\tif(List==NULL)\n\t\treturn element;\n\n"
-    content+="\t"+structureName+"* Pointer=List;\n\twhile(Pointer->next!=NULL)\n"
-    content+="\t\tPointer=Pointer->next;\n"
-    content+="\tPointer->next=element;\n\treturn List;\n}\n"
-    content+=structureName+"* reverse"+str(structureName).capitalize()+"List("+structureName+"* List){\n\n"
-    content+="\t"+structureName+" *ptr=List,*pivot=List,*head=List;\n"
-    content+="\twhile(head->next!=NULL){\n"
-    content+="\t\tpivot=head->next;\n"
-    content+="\t\thead->next=pivot->next;\n"
-    content+="\t\tpivot->next=NULL;\n"
-    content+="\t\tList=insert"+str(structureName).capitalize()+"Top(List,pivot);\n"
-    content+="\t}\n"
-    content+="\treturn List;\n"
-    content+="}\n"
+    content=structureName+"* insert"+str(structureName).capitalize()+"Top("+structureName+"* List, "+structureName+"* element){\n\n\telement->next=List;\n\treturn element;\n}\n"
+    content+=structureName+"* insert"+str(structureName).capitalize()+"End("+structureName+"* List, "+structureName+"* element){\n\n\tif(List==NULL)\n\t\treturn element;\n\n\t"+structureName+"* Pointer=List;\n\twhile(Pointer->next!=NULL)\n\t\tPointer=Pointer->next;\n\tPointer->next=element;\n\treturn List;\n}\n"
+    content+=structureName+"* reverse"+str(structureName).capitalize()+"List("+structureName+"* List){\n\n\t"+structureName+" *ptr=List,*pivot=List,*head=List;\n\twhile(head->next!=NULL){\n\t\tpivot=head->next;\n\t\thead->next=pivot->next;\n\t\tpivot->next=NULL;\n\t\tList=insert"+str(structureName).capitalize()+"Top(List,pivot);\n\t}\n\treturn List;\n}\n"
     return content
 
 def insertByField(structureName,fieldName,fieldType):
@@ -221,7 +181,8 @@ if(fileContent):
     mainFile.close()
     print(">> Generating Files..")
     print(">> Generating Main File..")
-    print(">> Generating Structure File..")
+    print(">> Generating Structures Files..")
+    print(">> Generating Makefile File..")
 
     structures=("".join(open(str(sys.argv[1]), "r").readlines())).split("\n")
     structureFile.write("#define DESC 0\n#define ASC 1\n\n\n")
@@ -236,26 +197,3 @@ if(fileContent):
             structureFile.write("struct "+structureName+"* next;\n")
         structureFile.write(element+"\n")
     structureFile.close()
-"""
-Il faut écrire les chaines dans une liste (addition, etc.) puis ecrire dans les fichiers pour que ça soit ordonné,
-commenter et tester les prototypes de fonctions dans les fichiers .h
-Régler le path des output (headers, bin, etc)
-documenter
-(on peut demander à l'utilisateur s'il veut générer un menu pour chaque structure)
-    Structure Schema:
-    [
-        [   "Structure_Name_1",
-            [(FieldName1,FieldType1),
-            (FieldName2,FieldType2),...
-            ]
-        ],
-        [   "Structure_Name_2",
-            [(FieldName1,FieldType1),
-            (FieldName2,FieldType2),...
-            ]
-        ]
-
-
-    ]
-    A* initA(void);
-    """
