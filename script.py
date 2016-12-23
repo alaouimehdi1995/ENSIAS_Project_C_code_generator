@@ -3,20 +3,53 @@ ENSIAS C Project Code Generator: Conceived and implemented by: ALAOUI Mehdi. 201
 """
 import sys
 import re
+#Class to define colors in Terminal
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+#Function that prints help
+def printHelp():
+    print(bcolors.WARNING+bcolors.BOLD+"Notes:"+bcolors.ENDC+" - Works only with python 3.3 or later version")
+    print("       - The input file is a header file that should contain all structures used in your project")
+    print("\n"+bcolors.OKGREEN+bcolors.BOLD+"Execution Command:"+bcolors.ENDC+" pythonVersion script.py input_header_file")
+    print("\n\t"+bcolors.UNDERLINE+"Example:"+bcolors.ENDC+" python3.5 script.py test.h")
+    print("\n"+bcolors.FAIL+bcolors.BOLD+"IMPORTANT:"+bcolors.ENDC+" - Structures must contain no pointers inside")
+    print("\t     (even the pointer into the next structure, it will be added automatically)")
+    print("\t   - Delete all comments before processing")
+    print("\t   - Delete all spaces between Structure name and brackets ({,})")
+    print("\t     (typedef struct Player{ not typedef struct Player {)")
+    print("\n"+bcolors.OKGREEN+bcolors.BOLD+"Input Header Content Example:"+bcolors.ENDC)
+    print("\n\ttypedef struct Player{\n")
+    print("\t\tchar Name[30];\n")
+    print("\t\tint Age;\n")
+    print("\t\tint TotalScore;\n")
+    print("\t}Player;\n\n")
+
 #Functions that parse input file
 def checkArgument(): #Function that checks script arguments
     try:
-        if ("h" not in (str(sys.argv[1]).split(".")[1:])):
-            print("The argument given is not a header file")
+        if(str(sys.argv[1]) in ["-h","--help"]):
+            printHelp()
+        elif ("h" not in (str(sys.argv[1]).split(".")[1:])):
+            print(bcolors.FAIL+bcolors.BOLD+"Error: "+bcolors.ENDC +"The argument given is not a header file\n")
+            print("For help, run the script with -h or --help as input\n\n")
         else:
             try:
                 fileContent = "".join(open(str(sys.argv[1]), "r").readlines()).split("typedef struct ")[1:]
                 return fileContent
             except:
-                print("File unreadable")
+                print(bcolors.FAIL+bcolors.BOLD+"Error: "+bcolors.ENDC +"File unreadable\n\n")
+                print("For help, run the script with -h or --help as input\n\n")
 
     except:
-        print("Give an argument to the script")
+        print(bcolors.FAIL+bcolors.BOLD+"Error: "+bcolors.ENDC +"Give an argument to the script\n\n")
+        print("For help, run the script with -h or --help as input\n\n")
 
 def getStructures(fileContent): #Function that returns a structured list of input structures
     structures=[]
@@ -108,8 +141,13 @@ def delete(structureName):
     return content
 #======================================================================================================
 
-#Programme principal
+#Main Program
 
+print("\n\n\n")
+print(bcolors.BOLD+bcolors.OKBLUE+"ENSIAS C Project Code Generator"+bcolors.ENDC)
+print("Conceived and implemented by: "+bcolors.OKGREEN+"ALAOUI Mehdi."+bcolors.ENDC)
+print(bcolors.UNDERLINE+"Copyright 2016. ENSIAS. All Rights Reserved."+bcolors.ENDC)
+print("\n")
 fileContent=checkArgument()
 if(fileContent):
     print(">> Reading structures..")
